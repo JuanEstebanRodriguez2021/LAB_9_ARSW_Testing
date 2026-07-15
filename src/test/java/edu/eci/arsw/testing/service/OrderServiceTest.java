@@ -5,6 +5,7 @@ import edu.eci.arsw.testing.model.Order;
 import edu.eci.arsw.testing.repository.OrderRepository;
 import org.junit.jupiter.api.Test;
 import java.time.Instant;
+import java.time.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -35,4 +36,27 @@ class OrderServiceTest {
         verify(repository, never()).save(any(Order.class));
     }
 
+    @Test
+    void shouldFindOrderById(){
+        OrderRepository repository = mock(OrderRepository.class);
+        OrderService service = new OrderService(repository);
+        Order order new Order("ORD-100", "CUS-99", 250000, "CREATED", Instant.now());
+        when(repository.findById("ORD-100").thenReturn(Optional.of(order)));
+        OrderResponse response = service.findById("ORD-100");
+        assertNotNull(response);
+        assertEquals("ORD-100", response.id());
+        assertEquals("CUS-99", response.customerId());
+        assertEquals(250000, response.total());
+        assertEquals("CREATED", response.status());
+        verify(repository, times(1)).findById("ORD-100");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenOrderDoesNotExist(){
+        OrderRepository repository = mock(OrderRepository.class);
+        OrderService service = new OrderService(repository);
+        when(repository.findById("ORD-999")).thenReturn(Optional.empty());
+        assertThrows(IllegalArgumentException.class, () -> service.findById("ORD-999"));
+        verify(repository, times(1)).findById("ORD-999");
+    }
 }
