@@ -1,4 +1,4 @@
-# ARSW - Software Testing Laboratory
+# ARSW Software Testing Laboratory - Juan Esteban Rodriguez
 
 ## Overview
 
